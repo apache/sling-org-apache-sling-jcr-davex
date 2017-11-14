@@ -177,37 +177,20 @@ public class SlingDavExServlet extends JcrRemotingServlet {
              * Creates a new session for the user of the slingSession in the
              * same workspace as the slingSession.
              * <p>
-             * Assumption: The admin session has permission to impersonate
-             * as any user without restriction. If this is not the case
-             * the Session.impersonate method throws a LoginException
-             * which is folded into a RepositoryException.
+             * Assumption: Every session can impersonate itself as it is defined by JCR 2.0.
              *
              * @param slingSession The session provided by the Sling
-             *            authentication mechanis,
+             *            authentication mechanism,
              * @return a new session which may (and will) outlast the request
-             * @throws RepositoryException If an error occurrs creating the
-             *             session.
+             * @throws RepositoryException If an error occurs creating the session.
              */
             private Session getLongLivedSession(final Session slingSession) throws RepositoryException {
-                Session adminSession = null;
                 final String user = slingSession.getUserID();
                 try {
                     final SimpleCredentials credentials = new SimpleCredentials(user, EMPTY_PW);
-                    final String wsp = slingSession.getWorkspace().getName();
-                    adminSession = SlingDavExServlet.this.repository.loginAdministrative(wsp);
-                    return adminSession.impersonate(credentials);
-                } catch (RepositoryException re) {
-
-                    // LoginException from impersonate (missing permission)
-                    // and RepositoryException from loginAdministrative and
-                    // impersonate folded into RepositoryException to
-                    // cause a 403/FORBIDDEN response
+                    return slingSession.impersonate(credentials);
+                } catch (Exception re) {
                     throw new RepositoryException("Cannot get session for " + user, re);
-
-                } finally {
-                    if (adminSession != null) {
-                        adminSession.logout();
-                    }
                 }
             }
         };
