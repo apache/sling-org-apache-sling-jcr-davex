@@ -123,7 +123,7 @@ public class SlingDavExServlet extends JcrRemotingServlet {
         final String protectedHandlers = config.dav_protectedhandlers();
 
         // prepare DavEx servlet config
-        final Dictionary<String, Object> initProps = new Hashtable<String, Object>();
+        final Dictionary<String, Object> initProps = new Hashtable<>();
         initProps.put(toInitParamProperty(INIT_PARAM_RESOURCE_PATH_PREFIX), davRoot);
         initProps.put(toInitParamProperty(INIT_PARAM_CREATE_ABSOLUTE_URI), Boolean.toString(createAbsoluteUri));
         initProps.put(toInitParamProperty(INIT_PARAM_CSRF_PROTECTION), CSRFUtil.DISABLED);
@@ -131,7 +131,7 @@ public class SlingDavExServlet extends JcrRemotingServlet {
         initProps.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, davRoot.concat("/*"));
         initProps.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
             "(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=" + AuthHttpContext.HTTP_CONTEXT_NAME + ")");
-        initProps.put(PAR_AUTH_REQ, "-" + davRoot); // make sure this is not forcible authenticated !
+        initProps.put(PAR_AUTH_REQ, "-" + davRoot); // make sure this is not forcibly authenticated !
         this.davServlet = bundleContext.registerService(Servlet.class.getName(), this, initProps);
     }
 
