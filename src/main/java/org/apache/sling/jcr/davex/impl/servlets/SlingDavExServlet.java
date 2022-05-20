@@ -18,7 +18,6 @@ package org.apache.sling.jcr.davex.impl.servlets;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.Map;
 
 import javax.jcr.LoginException;
 import javax.jcr.Repository;
@@ -34,10 +33,8 @@ import org.apache.jackrabbit.server.remoting.davex.JcrRemotingServlet;
 import org.apache.jackrabbit.webdav.util.CSRFUtil;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.auth.core.AuthenticationSupport;
-import org.apache.sling.commons.osgi.OsgiUtil;
 import org.apache.sling.jcr.api.SlingRepository;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -65,6 +62,7 @@ import org.osgi.service.component.propertytypes.ServiceVendor;
 @Designate(ocd = SlingDavExServlet.Config.class)
 public class SlingDavExServlet extends JcrRemotingServlet {
 
+    @SuppressWarnings("java:S100")
     @ObjectClassDefinition(name = "%dav.name",  description = "%dav.description")
     public @interface Config {
 
