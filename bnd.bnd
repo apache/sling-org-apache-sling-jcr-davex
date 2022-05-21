@@ -1,10 +1,14 @@
 Bundle-Category: sling,jcr
-Private-Package: org.apache.jackrabbit.server, \
-                 org.apache.jackrabbit.server.jcr, \
-                 org.apache.jackrabbit.server.remoting.davex, \
-                 org.apache.jackrabbit.server.util, \
-                 org.apache.jackrabbit.webdav.jcr.*, \
-                 org.apache.sling.jcr.davex.impl.*
+Private-Package:\
+    org.apache.jackrabbit.server,\
+    org.apache.jackrabbit.server.jcr,\
+    org.apache.jackrabbit.server.remoting.davex,\
+    org.apache.jackrabbit.server.util,\
+    org.apache.jackrabbit.webdav.jcr.*,\
+    org.apache.sling.jcr.davex.impl.*
 
 -includeresource:\
     @jackrabbit-jcr-server-*.jar!/org/apache/jackrabbit/server/io/IOUtil*.class
+
+-removeheaders:\
+  Include-Resource

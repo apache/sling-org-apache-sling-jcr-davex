@@ -35,6 +35,7 @@ import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.auth.core.AuthenticationSupport;
 import org.apache.sling.jcr.api.SlingRepository;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -57,10 +58,13 @@ import org.osgi.service.component.propertytypes.ServiceVendor;
  */
 @SuppressWarnings("serial")
 @Component(configurationPolicy = ConfigurationPolicy.REQUIRE)
-@ServiceVendor("The Apache Software Foundation")
-@ServiceDescription("Sling JcrRemoting Servlet")
+@ServiceVendor(SlingDavExServlet.SERVICE_VENDOR)
+@ServiceDescription(SlingDavExServlet.SERVICE_DESCRIPTION)
 @Designate(ocd = SlingDavExServlet.Config.class)
 public class SlingDavExServlet extends JcrRemotingServlet {
+
+    protected static final String SERVICE_VENDOR = "The Apache Software Foundation";
+    protected static final String SERVICE_DESCRIPTION = "Sling JcrRemoting Servlet";
 
     @SuppressWarnings("java:S100")
     @ObjectClassDefinition(name = "%dav.name",  description = "%dav.description")
@@ -70,7 +74,7 @@ public class SlingDavExServlet extends JcrRemotingServlet {
          * Name of the property to configure the location for the DavEx servlet
          * registration. Default for the property is {@link #DEFAULT_DAV_ROOT}.
          */
-        @AttributeDefinition
+        @AttributeDefinition(name = "%alias.name", description = "%alias.description")
         String alias() default DEFAULT_DAV_ROOT;
 
         /**
@@ -78,7 +82,7 @@ public class SlingDavExServlet extends JcrRemotingServlet {
          * absolute paths ({@code false}) are generated in responses. Default for
          * the property is true.
          */
-        @AttributeDefinition
+        @AttributeDefinition( name = "%dav.create-absolute-uri.name", description = "%dav.create-absolute-uri.description")
         boolean dav_create$_$absolute$_$uri() default true;
 
         /**
@@ -124,14 +128,18 @@ public class SlingDavExServlet extends JcrRemotingServlet {
 
         // prepare DavEx servlet config
         final Dictionary<String, Object> initProps = new Hashtable<>();
+
         initProps.put(toInitParamProperty(INIT_PARAM_RESOURCE_PATH_PREFIX), davRoot);
         initProps.put(toInitParamProperty(INIT_PARAM_CREATE_ABSOLUTE_URI), Boolean.toString(createAbsoluteUri));
         initProps.put(toInitParamProperty(INIT_PARAM_CSRF_PROTECTION), CSRFUtil.DISABLED);
         initProps.put(toInitParamProperty(INIT_PARAM_PROTECTED_HANDLERS_CONFIG), protectedHandlers);
         initProps.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, davRoot.concat("/*"));
+        initProps.put(Constants.SERVICE_VENDOR, SERVICE_VENDOR);
+        initProps.put(Constants.SERVICE_DESCRIPTION, SERVICE_DESCRIPTION);
         initProps.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
             "(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=" + AuthHttpContext.HTTP_CONTEXT_NAME + ")");
         initProps.put(PAR_AUTH_REQ, "-" + davRoot); // make sure this is not forcibly authenticated !
+
         this.davServlet = bundleContext.registerService(Servlet.class.getName(), this, initProps);
     }
 

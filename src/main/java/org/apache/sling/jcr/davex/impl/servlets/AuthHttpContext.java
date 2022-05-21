@@ -24,23 +24,18 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.sling.auth.core.AuthenticationSupport;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.propertytypes.ServiceDescription;
 import org.osgi.service.component.propertytypes.ServiceRanking;
 import org.osgi.service.component.propertytypes.ServiceVendor;
 import org.osgi.service.http.context.ServletContextHelper;
-import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
+import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardContext;
 
-@Component(configurationPolicy = ConfigurationPolicy.IGNORE,
-        service = {ServletContextHelper.class},
-        property = {
-                HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + " = " + AuthHttpContext.HTTP_CONTEXT_NAME,
-                HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_PATH + " = " + "/"
-        })
+@Component(service = ServletContextHelper.class)
+@HttpWhiteboardContext(name = AuthHttpContext.HTTP_CONTEXT_NAME, path = "/")
 @ServiceDescription("Sling JcrRemoting Servlet")
 @ServiceVendor("The Apache Software Foundation")
-@ServiceRanking(5)
+@ServiceRanking(4)
 public class AuthHttpContext extends ServletContextHelper {
 
     /**

@@ -33,6 +33,7 @@
     </scm>
 
     <properties>
+        <sling.java.version>8</sling.java.version>
         <jackrabbit.version>2.14.3</jackrabbit.version>
         <project.build.outputTimestamp>1</project.build.outputTimestamp>
     </properties>
@@ -116,6 +117,7 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>osgi.core</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
@@ -135,7 +137,7 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.service.http.whiteboard</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.1</version>
         </dependency>
 
         <!-- JUnit -->
