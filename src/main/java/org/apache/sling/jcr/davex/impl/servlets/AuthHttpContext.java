@@ -35,7 +35,7 @@ import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardContext;
 @HttpWhiteboardContext(name = AuthHttpContext.HTTP_CONTEXT_NAME, path = "/")
 @ServiceDescription("Sling JcrRemoting Servlet")
 @ServiceVendor("The Apache Software Foundation")
-@ServiceRanking(4)
+@ServiceRanking(5)
 public class AuthHttpContext extends ServletContextHelper {
 
     /**
