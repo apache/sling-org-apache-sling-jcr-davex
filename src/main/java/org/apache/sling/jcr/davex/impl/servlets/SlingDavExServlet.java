@@ -18,7 +18,6 @@ package org.apache.sling.jcr.davex.impl.servlets;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.Map;
 
 import javax.jcr.LoginException;
 import javax.jcr.Repository;
@@ -29,26 +28,28 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.felix.scr.annotations.Activate;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.ConfigurationPolicy;
-import org.apache.felix.scr.annotations.Deactivate;
-import org.apache.felix.scr.annotations.Properties;
-import org.apache.felix.scr.annotations.Property;
-import org.apache.felix.scr.annotations.Reference;
 import org.apache.jackrabbit.server.SessionProvider;
 import org.apache.jackrabbit.server.remoting.davex.JcrRemotingServlet;
 import org.apache.jackrabbit.webdav.util.CSRFUtil;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.auth.core.AuthenticationSupport;
-import org.apache.sling.commons.osgi.OsgiUtil;
 import org.apache.sling.jcr.api.SlingRepository;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
+import org.osgi.service.metatype.annotations.AttributeDefinition;
+import org.osgi.service.metatype.annotations.Designate;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.osgi.service.component.propertytypes.ServiceDescription;
+import org.osgi.service.component.propertytypes.ServiceVendor;
 
 /**
  * DavEx WebDav servlet which acquires a Repository instance via the OSGi
@@ -56,45 +57,49 @@ import org.slf4j.LoggerFactory;
  *
  */
 @SuppressWarnings("serial")
-@Component(metatype = true, label = "%dav.name",
-           description = "%dav.description",
-           policy = ConfigurationPolicy.REQUIRE)
-@Properties({ @Property(name = Constants.SERVICE_DESCRIPTION, value = "Sling JcrRemoting Servlet"),
-    @Property(name = Constants.SERVICE_VENDOR, value = "The Apache Software Foundation") })
+@Component(configurationPolicy = ConfigurationPolicy.REQUIRE)
+@ServiceVendor(SlingDavExServlet.SERVICE_VENDOR)
+@ServiceDescription(SlingDavExServlet.SERVICE_DESCRIPTION)
+@Designate(ocd = SlingDavExServlet.Config.class)
 public class SlingDavExServlet extends JcrRemotingServlet {
+
+    protected static final String SERVICE_VENDOR = "The Apache Software Foundation";
+    protected static final String SERVICE_DESCRIPTION = "Sling JcrRemoting Servlet";
+
+    @SuppressWarnings("java:S100")
+    @ObjectClassDefinition(name = "%dav.name",  description = "%dav.description")
+    public @interface Config {
+
+        /**
+         * Name of the property to configure the location for the DavEx servlet
+         * registration. Default for the property is {@link #DEFAULT_DAV_ROOT}.
+         */
+        @AttributeDefinition(name = "%alias.name", description = "%alias.description")
+        String alias() default DEFAULT_DAV_ROOT;
+
+        /**
+         * Name of the property to configure whether absolute URIs ({@code true}) or
+         * absolute paths ({@code false}) are generated in responses. Default for
+         * the property is true.
+         */
+        @AttributeDefinition( name = "%dav.create-absolute-uri.name", description = "%dav.create-absolute-uri.description")
+        boolean dav_create$_$absolute$_$uri() default true;
+
+        /**
+         * defines the Protected handlers for the Jcr Remoting Servlet
+         */
+        @AttributeDefinition
+        String dav_protectedhandlers() default DEFAULT_PROTECTED_HANDLERS;
+    }
 
     /**
      * Default value for the DavEx servlet registration.
      */
     private static final String DEFAULT_DAV_ROOT = "/server";
-
     /**
-     * Name of the property to configure the location for the DavEx servlet
-     * registration. Default for the property is {@link #DEFAULT_DAV_ROOT}.
-     */
-    @Property(value=DEFAULT_DAV_ROOT)
-    private static final String PROP_DAV_ROOT = "alias";
-
-    private static final boolean DEFAULT_CREATE_ABSOLUTE_URI = true;
-
-    /**
-     * Name of the property to configure whether absolute URIs ({@code true}) or
-     * absolute paths ({@code false}) are generated in responses. Default for
-     * the property is {@link #DEFAULT_CREATE_ABSOLUTE_URI}.
-     */
-    @Property(boolValue=DEFAULT_CREATE_ABSOLUTE_URI)
-    private static final String PROP_CREATE_ABSOLUTE_URI = "dav.create-absolute-uri";
-
-    /**
-     * Default value for the configuration {@link #PROP_PROTECTED_HANDLERS}
+     * Default value for the configuration
      */
     private static final String DEFAULT_PROTECTED_HANDLERS = "org.apache.jackrabbit.server.remoting.davex.AclRemoveHandler";
-
-    /**
-     * defines the Protected handlers for the Jcr Remoting Servlet
-     */
-    @Property(value=DEFAULT_PROTECTED_HANDLERS)
-    private static final String PROP_PROTECTED_HANDLERS = "dav.protectedhandlers";
 
     /**
      * The name of the service property of the registered dummy service to cause
@@ -116,23 +121,25 @@ public class SlingDavExServlet extends JcrRemotingServlet {
     private ServiceRegistration davServlet;
 
     @Activate
-    protected void activate(final BundleContext bundleContext, final Map<String, ?> config) {
-        final String davRoot = OsgiUtil.toString(config.get(PROP_DAV_ROOT), DEFAULT_DAV_ROOT);
-        final boolean createAbsoluteUri = OsgiUtil.toBoolean(config.get(PROP_CREATE_ABSOLUTE_URI), DEFAULT_CREATE_ABSOLUTE_URI);
-        final String protectedHandlers = OsgiUtil.toString(config.get(PROP_PROTECTED_HANDLERS), DEFAULT_PROTECTED_HANDLERS);
+    protected void activate(final BundleContext bundleContext, Config config) {
+        final String davRoot = config.alias();
+        final boolean createAbsoluteUri = config.dav_create$_$absolute$_$uri();
+        final String protectedHandlers = config.dav_protectedhandlers();
 
         // prepare DavEx servlet config
-        final Dictionary<String, Object> initProps = new Hashtable<String, Object>();
+        final Dictionary<String, Object> initProps = new Hashtable<>();
+
         initProps.put(toInitParamProperty(INIT_PARAM_RESOURCE_PATH_PREFIX), davRoot);
         initProps.put(toInitParamProperty(INIT_PARAM_CREATE_ABSOLUTE_URI), Boolean.toString(createAbsoluteUri));
         initProps.put(toInitParamProperty(INIT_PARAM_CSRF_PROTECTION), CSRFUtil.DISABLED);
         initProps.put(toInitParamProperty(INIT_PARAM_PROTECTED_HANDLERS_CONFIG), protectedHandlers);
         initProps.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, davRoot.concat("/*"));
+        initProps.put(Constants.SERVICE_VENDOR, SERVICE_VENDOR);
+        initProps.put(Constants.SERVICE_DESCRIPTION, SERVICE_DESCRIPTION);
         initProps.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
             "(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=" + AuthHttpContext.HTTP_CONTEXT_NAME + ")");
-        initProps.put(Constants.SERVICE_VENDOR, config.get(Constants.SERVICE_VENDOR));
-        initProps.put(Constants.SERVICE_DESCRIPTION, config.get(Constants.SERVICE_DESCRIPTION));
-        initProps.put(PAR_AUTH_REQ, "-" + davRoot); // make sure this is not forcible authenticated !
+        initProps.put(PAR_AUTH_REQ, "-" + davRoot); // make sure this is not forcibly authenticated !
+
         this.davServlet = bundleContext.registerService(Servlet.class.getName(), this, initProps);
     }
 

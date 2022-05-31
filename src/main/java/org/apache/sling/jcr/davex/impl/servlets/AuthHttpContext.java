@@ -22,26 +22,20 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.ConfigurationPolicy;
-import org.apache.felix.scr.annotations.Properties;
-import org.apache.felix.scr.annotations.Property;
-import org.apache.felix.scr.annotations.Reference;
-import org.apache.felix.scr.annotations.Service;
 import org.apache.sling.auth.core.AuthenticationSupport;
-import org.osgi.framework.Constants;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.propertytypes.ServiceDescription;
+import org.osgi.service.component.propertytypes.ServiceRanking;
+import org.osgi.service.component.propertytypes.ServiceVendor;
 import org.osgi.service.http.context.ServletContextHelper;
-import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
+import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardContext;
 
-@Component(metatype = false, policy = ConfigurationPolicy.IGNORE)
-@Service(ServletContextHelper.class)
-@Properties({
-    @Property(name = Constants.SERVICE_DESCRIPTION, value = "Sling JcrRemoting Servlet"),
-    @Property(name = Constants.SERVICE_VENDOR, value = "The Apache Software Foundation"),
-    @Property(name = HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME, value = AuthHttpContext.HTTP_CONTEXT_NAME),
-    @Property(name = HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_PATH, value = "/"),
-    @Property(name = Constants.SERVICE_RANKING, intValue = 5)
-})
+@Component(service = ServletContextHelper.class)
+@HttpWhiteboardContext(name = AuthHttpContext.HTTP_CONTEXT_NAME, path = "/")
+@ServiceDescription("Sling JcrRemoting Servlet")
+@ServiceVendor("The Apache Software Foundation")
+@ServiceRanking(5)
 public class AuthHttpContext extends ServletContextHelper {
 
     /**
