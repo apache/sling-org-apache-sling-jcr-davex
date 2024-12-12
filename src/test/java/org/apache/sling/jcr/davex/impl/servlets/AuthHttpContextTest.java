@@ -21,7 +21,6 @@ package org.apache.sling.jcr.davex.impl.servlets;
 import java.lang.reflect.Method;
 
 import junit.framework.TestCase;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -76,5 +75,4 @@ public class AuthHttpContextTest {
         TestCase.assertEquals("w", getWorkspace.invoke(ahc, "/w/abc/xyz"));
         TestCase.assertEquals("wsp", getWorkspace.invoke(ahc, "/wsp/abc/xyz"));
     }
-
 }

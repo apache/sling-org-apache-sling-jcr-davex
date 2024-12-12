@@ -1,23 +1,22 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements. See the NOTICE file distributed with this
- * work for additional information regarding copyright ownership. The ASF
- * licenses this file to You under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package org.apache.sling.jcr.davex.impl.servlets;
-
-import java.util.Dictionary;
-import java.util.Hashtable;
 
 import javax.jcr.LoginException;
 import javax.jcr.Repository;
@@ -27,6 +26,9 @@ import javax.jcr.SimpleCredentials;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 import org.apache.jackrabbit.server.SessionProvider;
 import org.apache.jackrabbit.server.remoting.davex.JcrRemotingServlet;
@@ -42,14 +44,14 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.propertytypes.ServiceDescription;
+import org.osgi.service.component.propertytypes.ServiceVendor;
 import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
 import org.osgi.service.metatype.annotations.AttributeDefinition;
 import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.osgi.service.component.propertytypes.ServiceDescription;
-import org.osgi.service.component.propertytypes.ServiceVendor;
 
 /**
  * DavEx WebDav servlet which acquires a Repository instance via the OSGi
@@ -67,7 +69,7 @@ public class SlingDavExServlet extends JcrRemotingServlet {
     protected static final String SERVICE_DESCRIPTION = "Sling JcrRemoting Servlet";
 
     @SuppressWarnings("java:S100")
-    @ObjectClassDefinition(name = "%dav.name",  description = "%dav.description")
+    @ObjectClassDefinition(name = "%dav.name", description = "%dav.description")
     public @interface Config {
 
         /**
@@ -82,7 +84,9 @@ public class SlingDavExServlet extends JcrRemotingServlet {
          * absolute paths ({@code false}) are generated in responses. Default for
          * the property is true.
          */
-        @AttributeDefinition( name = "%dav.create-absolute-uri.name", description = "%dav.create-absolute-uri.description")
+        @AttributeDefinition(
+                name = "%dav.create-absolute-uri.name",
+                description = "%dav.create-absolute-uri.description")
         boolean dav_create$_$absolute$_$uri() default true;
 
         /**
@@ -99,7 +103,8 @@ public class SlingDavExServlet extends JcrRemotingServlet {
     /**
      * Default value for the configuration
      */
-    private static final String DEFAULT_PROTECTED_HANDLERS = "org.apache.jackrabbit.server.remoting.davex.AclRemoveHandler";
+    private static final String DEFAULT_PROTECTED_HANDLERS =
+            "org.apache.jackrabbit.server.remoting.davex.AclRemoveHandler";
 
     /**
      * The name of the service property of the registered dummy service to cause
@@ -136,8 +141,10 @@ public class SlingDavExServlet extends JcrRemotingServlet {
         initProps.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, davRoot.concat("/*"));
         initProps.put(Constants.SERVICE_VENDOR, SERVICE_VENDOR);
         initProps.put(Constants.SERVICE_DESCRIPTION, SERVICE_DESCRIPTION);
-        initProps.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
-            "(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=" + AuthHttpContext.HTTP_CONTEXT_NAME + ")");
+        initProps.put(
+                HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
+                "(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=" + AuthHttpContext.HTTP_CONTEXT_NAME
+                        + ")");
         initProps.put(PAR_AUTH_REQ, "-" + davRoot); // make sure this is not forcibly authenticated !
 
         this.davServlet = bundleContext.registerService(Servlet.class.getName(), this, initProps);
@@ -145,7 +152,7 @@ public class SlingDavExServlet extends JcrRemotingServlet {
 
     @Deactivate
     protected void deactivate() {
-        if (this.davServlet!= null) {
+        if (this.davServlet != null) {
             this.davServlet.unregister();
             this.davServlet = null;
         }
@@ -162,7 +169,8 @@ public class SlingDavExServlet extends JcrRemotingServlet {
 
             public Session getSession(final HttpServletRequest req, final Repository repository, final String workspace)
                     throws LoginException, RepositoryException, ServletException {
-                final ResourceResolver resolver = (ResourceResolver) req.getAttribute(AuthenticationSupport.REQUEST_ATTRIBUTE_RESOLVER);
+                final ResourceResolver resolver =
+                        (ResourceResolver) req.getAttribute(AuthenticationSupport.REQUEST_ATTRIBUTE_RESOLVER);
                 if (resolver != null) {
                     final Session session = resolver.adaptTo(Session.class);
                     if (session != null) {
