@@ -18,7 +18,7 @@
     </parent>
 
     <artifactId>org.apache.sling.jcr.davex</artifactId>
-    <version>1.3.11-SNAPSHOT</version>
+    <version>1.3.12</version>
 
     <name>Apache Sling JCR DavEx</name>
     <description>Bundle to access JCR repositories over DavEx</description>
@@ -26,14 +26,14 @@
     <scm>
         <connection>scm:git:https://gitbox.apache.org/repos/asf/sling-org-apache-sling-jcr-davex.git</connection>
         <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/sling-org-apache-sling-jcr-davex.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>org.apache.sling.jcr.davex-1.3.12</tag>
         <url>https://github.com/apache/sling-org-apache-sling-jcr-davex.git</url>
     </scm>
 
     <properties>
         <sling.java.version>8</sling.java.version>
         <jackrabbit.version>2.14.3</jackrabbit.version>
-        <project.build.outputTimestamp>1</project.build.outputTimestamp>
+        <project.build.outputTimestamp>1734084605</project.build.outputTimestamp>
     </properties>
 
     <dependencies>
