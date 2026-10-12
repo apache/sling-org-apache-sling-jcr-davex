@@ -32,7 +32,7 @@
 
     <properties>
         <sling.java.version>11</sling.java.version>
-        <jackrabbit.version>2.22.4</jackrabbit.version>
+        <jackrabbit.version>2.22.5</jackrabbit.version>
         <project.build.outputTimestamp>1786447761</project.build.outputTimestamp>
     </properties>
 
